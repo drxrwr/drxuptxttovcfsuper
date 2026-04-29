@@ -155,6 +155,10 @@ document.getElementById("splitVCFButton").addEventListener("click", async functi
   const zip = new JSZip();
   let globalIndexCounter = 0;
 
+  // 🔥 HITUNG TOTAL & DIGIT
+  const totalContacts = results.reduce((sum, f) => sum + f.lines.length, 0);
+  const maxDigits = totalContacts.toString().length;
+
   for (let fileIndex = 0; fileIndex < results.length; fileIndex++) {
     const fileData = results[fileIndex];
     let fileChunks = [];
@@ -174,12 +178,15 @@ document.getElementById("splitVCFButton").addEventListener("click", async functi
         let contactName = "";
 
         if (useCustomName) {
-          const localIdx = idx + 1;
           const separator = useSpace ? " " : "";
+          const localIdx = padNumber(idx + 1, maxDigits); // 🔥 ikut padding
           contactName = `${parseWithSpasi(nameBase)} ${parseWithSpasi(fileNameRaw)}${separator}${startNumber + fileIndex}${parseWithSpasi(additionalFileNameRaw)} ${localIdx}`.trim();
         } else {
           globalIndexCounter++;
-          contactName = nameBase ? `${parseWithSpasi(nameBase)} ${globalIndexCounter}` : `kontak ${globalIndexCounter}`;
+          const paddedIndex = padNumber(globalIndexCounter, maxDigits); // 🔥 inti fix
+          contactName = nameBase
+            ? `${parseWithSpasi(nameBase)} ${paddedIndex}`
+            : `kontak ${paddedIndex}`;
         }
 
         vcfContent += `BEGIN:VCARD\nVERSION:3.0\nFN:${contactName}\nTEL:${number}\nEND:VCARD\n`;
